@@ -15,7 +15,7 @@ export default class EncryptionService {
                 } else {
                     resolve(buffer.toString('base64'));
                 }
-            })
+            });
         });
     }
 
