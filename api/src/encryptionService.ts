@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import * as crypto from 'crypto';
+import crypto from 'crypto';
 
 export default class EncryptionService {
 

@@ -34,7 +34,7 @@ export default class AuthenticationService {
     public newUser(username: string, password: string): Promise<boolean> {
         return new Promise<boolean>((resolve, reject) => {
             if(this.users.has(username)) {
-                reject();
+                resolve(false);
             } else {
                 this.encryptionService.encrypt(password).then(hash => {
                     this.users.set(username, { 
@@ -42,7 +42,7 @@ export default class AuthenticationService {
                         hashedPassword: hash
                     });
         
-                    resolve();
+                    resolve(true);
                 });
             }
         });
@@ -58,6 +58,30 @@ export default class AuthenticationService {
             .then(result => this.storeSecureToken(result));
     }
 
+    public authenticate(selector: string, validator: string, timestamp: Date): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
+            if(this.sessions.has(selector)) {
+                let hashedValidator: string = this.sessions.get(selector)!.hashedValidator;
+                let expiryDate: Date = this.sessions.get(selector)!.expiry;
+
+                if(timestamp.valueOf() > expiryDate.valueOf()) {
+                    this.encryptionService.comparePasswords(validator, hashedValidator).then(result => {
+                        if(result && result === true) {
+                            resolve(this.sessions.get(selector)!.username);
+                        } else {
+                            reject();
+                        }
+                    });
+                } else {
+                    this.sessions.delete(selector);
+                    reject();
+                }
+            } else {
+                reject();
+            }
+        });
+    }
+
     private checkUserExists(username: string): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             if(this.users.has(username)) {
@@ -70,9 +94,12 @@ export default class AuthenticationService {
 
     private validatePassword(username: string, password: string): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            this.encryptionService.comparePasswords(password, this.users.get(username)!.hashedPassword).then(result => {
+            let hashedPassword: string = this.users.get(username)!.hashedPassword;
+            this.encryptionService.comparePasswords(password, hashedPassword).then(result => {
                 if(result) {
-                    resolve()
+                    resolve();
+                } else {
+                    reject();
                 }
             }).catch(reason => {
                 reject(reason);
@@ -126,8 +153,15 @@ export default class AuthenticationService {
 
     private storeSecureToken(prevResult: SessionData & { validator: string }): Promise<AuthToken> {
         return new Promise<AuthToken>((resolve, reject) => {
-            this.sessions.set(prevResult.selector, prevResult as SessionData);
-            resolve(prevResult as AuthToken);
+            this.sessions.set(prevResult.selector, {
+                selector: prevResult.selector,
+                hashedValidator: prevResult.hashedValidator,
+                username: prevResult.username,
+                expiry: prevResult.expiry });
+            resolve({
+                selector: prevResult.selector,
+                validator: prevResult.validator
+            });
         });
     }
 }
