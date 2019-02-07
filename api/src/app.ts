@@ -5,7 +5,7 @@ const app = express();
 const port: number = 3080;
 
 app.use(express.json());
-let authenticationService: AuthenticationService = new AuthenticationService();
+const authenticationService: AuthenticationService = new AuthenticationService();
 
 app.post('/signup/', (request, response) => {
     const username: string = request.body.username;
@@ -28,7 +28,7 @@ app.post('/login/', (request, response) => {
     authenticationService.logIn(username, password, remember).then(token => {
         response.send(token);
     }).catch(error => {
-        response.send(`Login failed: ${error}`);
+        response.send(`Login failed: ${error.message}`);
     });
 });
 
@@ -40,7 +40,7 @@ app.post('/auth/', (request, response) => {
     authenticationService.authenticate(selector, validator, timestamp).then(user => {
         response.send(`Authenticated as ${user}.`);
     }).catch(error => {
-        response.send(`Authentication failed: ${error}`);
+        response.send(`Authentication failed: ${error.message}`);
     });
 });
 

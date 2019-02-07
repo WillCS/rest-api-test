@@ -1,24 +1,23 @@
 import EncryptionService from './encryptionService';
 
-type User = {
-    username: string,
-    hashedPassword: string
-};
-
-type AuthToken = {
-    selector: string,
-    validator: string,
+interface User {
+    username: string;
+    hashedPassword: string;
 }
 
-type SessionData = {
-    selector: string,
-    hashedValidator: string,
-    username: string,
-    expiry: Date
+interface AuthToken {
+    selector: string;
+    validator: string;
+}
+
+interface SessionData {
+    selector: string;
+    hashedValidator: string;
+    username: string;
+    expiry: Date;
 }
 
 export default class AuthenticationService {
-
     // These are our """"""""databases""""""""
     private users: Map<string, User> = new Map<string, User>();
     private sessions: Map<string, SessionData> = new Map<string, SessionData>();
@@ -30,10 +29,10 @@ export default class AuthenticationService {
             return false;
         }
 
-        const hash: string = await this.encryptionService.encrypt(password);
-        this.users.set(username, { 
-            username: username, 
-            hashedPassword: hash
+        const hashedPassword: string = await this.encryptionService.encrypt(password);
+        this.users.set(username, {
+            hashedPassword,
+            username
         });
 
         return true;
@@ -46,7 +45,7 @@ export default class AuthenticationService {
         const selector: string = await this.generateTokenSelector();
         const validator: string = await this.generateTokenValidator(selector);
         const hashedValidator: string = await this.hashTokenValidator(validator);
-        
+
         await this.createSession(selector, hashedValidator, username, remember);
 
         return { selector, validator };
@@ -57,7 +56,7 @@ export default class AuthenticationService {
             return await this.validateToken(selector, validator, timestamp);
         }
 
-        throw "Session invalid.";
+        throw new Error("Session invalid.");
     }
 
     private async validateToken(selector: string, validator: string, timestamp: Date): Promise<string> {
@@ -70,19 +69,19 @@ export default class AuthenticationService {
             if(matches) {
                 return this.sessions.get(selector)!.username;
             }
-            
-            throw "Bad token.";
+
+            throw new Error("Bad token.");
         }
 
-        throw "Session expired.";
+        throw new Error("Session expired.");
     }
 
     private async checkUserExists(username: string): Promise<void> {
         if(this.users.has(username)) {
             return;
         }
-        
-        throw "User invalid.";
+
+        throw new Error("User invalid.");
     }
 
     private async validatePassword(username: string, password: string): Promise<void> {
@@ -93,7 +92,7 @@ export default class AuthenticationService {
             return;
         }
 
-        throw "Bad password.";
+        throw new Error("Bad password.");
     }
 
     private async generateTokenSelector(): Promise <string> {
@@ -102,14 +101,14 @@ export default class AuthenticationService {
 
     private async generateTokenValidator(selector: string): Promise<string> {
         return await this.encryptionService.generateRandomToken();
-        
     }
 
     private async hashTokenValidator(validator: string): Promise<string> {
         return await this.encryptionService.encrypt(validator);
     }
 
-    private async createSession(selector: string, hashedValidator: string, username: string, longToken: boolean): Promise<void> {
+    private async createSession(selector: string, hashedValidator: string, username: string, longToken: boolean)
+            : Promise<void> {
         let expiryEpoch: number = Date.now();
         if(!longToken) {
             expiryEpoch += 3600000;  // One hour in milliseoncds because new Date() sucks
