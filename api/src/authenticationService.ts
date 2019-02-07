@@ -20,137 +20,110 @@ type SessionData = {
 export default class AuthenticationService {
 
     // These are our """"""""databases""""""""
-    private users: Map<string, User>;
-    private sessions: Map<string, SessionData>;
+    private users: Map<string, User> = new Map<string, User>();
+    private sessions: Map<string, SessionData> = new Map<string, SessionData>();
 
-    private encryptionService: EncryptionService;
+    private encryptionService: EncryptionService = new EncryptionService();
 
-    constructor() {
-        this.users = new Map<string, User>();
-        this.sessions = new Map<string, SessionData>();
-        this.encryptionService = new EncryptionService();
-    }
+    public async newUser(username: string, password: string): Promise<boolean> {
+        if(this.users.has(username)) {
+            return false;
+        }
 
-    public newUser(username: string, password: string): Promise<boolean> {
-        return new Promise<boolean>((resolve, reject) => {
-            if(this.users.has(username)) {
-                resolve(false);
-            } else {
-                this.encryptionService.encrypt(password).then(hash => {
-                    this.users.set(username, { 
-                        username: username, 
-                        hashedPassword: hash
-                    });
-        
-                    resolve(true);
-                });
-            }
+        const hash: string = await this.encryptionService.encrypt(password);
+        this.users.set(username, { 
+            username: username, 
+            hashedPassword: hash
         });
+
+        return true;
     }
 
     public async logIn(username: string, password: string, remember: boolean = false): Promise<AuthToken> {
         await this.checkUserExists(username);
         await this.validatePassword(username, password);
 
-        const selector = await this.generateTokenSelector();
-        const validator = await this.generateTokenValidator(selector);
-        const hashedValidator = await this.hashTokenValidator(validator);
+        const selector: string = await this.generateTokenSelector();
+        const validator: string = await this.generateTokenValidator(selector);
+        const hashedValidator: string = await this.hashTokenValidator(validator);
         
         await this.createSession(selector, hashedValidator, username, remember);
 
         return { selector, validator };
     }
 
-    public authenticate(selector: string, validator: string, timestamp: Date): Promise<string> {
-        return new Promise<string>((resolve, reject) => {
-            if(this.sessions.has(selector)) {
-                let hashedValidator: string = this.sessions.get(selector)!.hashedValidator;
-                let expiryDate: Date = this.sessions.get(selector)!.expiry;
+    public async authenticate(selector: string, validator: string, timestamp: Date): Promise<string> {
+        if(this.sessions.has(selector)) {
+            return await this.validateToken(selector, validator, timestamp);
+        }
 
-                if(timestamp.valueOf() > expiryDate.valueOf()) {
-                    this.encryptionService.comparePasswords(validator, hashedValidator).then(result => {
-                        if(result && result === true) {
-                            resolve(this.sessions.get(selector)!.username);
-                        } else {
-                            reject();
-                        }
-                    });
-                } else {
-                    this.sessions.delete(selector);
-                    reject();
-                }
-            } else {
-                reject();
+        throw "Session invalid.";
+    }
+
+    private async validateToken(selector: string, validator: string, timestamp: Date): Promise<string> {
+        const hashedValidator: string = this.sessions.get(selector)!.hashedValidator;
+        const expiryDate: Date = this.sessions.get(selector)!.expiry;
+
+        if(timestamp.valueOf() < expiryDate.valueOf()) {
+            const matches: boolean = await this.encryptionService.compare(validator, hashedValidator);
+
+            if(matches) {
+                return this.sessions.get(selector)!.username;
             }
-        });
+            
+            throw "Bad token.";
+        }
+
+        throw "Session expired.";
     }
 
-    private checkUserExists(username: string): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            if(this.users.has(username)) {
-                resolve();
-            } else {
-                reject();
-            }
-        });
+    private async checkUserExists(username: string): Promise<void> {
+        if(this.users.has(username)) {
+            return;
+        }
+        
+        throw "User invalid.";
     }
 
-    private validatePassword(username: string, password: string): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            let hashedPassword: string = this.users.get(username)!.hashedPassword;
-            this.encryptionService.comparePasswords(password, hashedPassword).then(result => {
-                if(result) {
-                    resolve();
-                } else {
-                    reject();
-                }
-            }).catch(reason => {
-                reject(reason);
-            });
-        });
+    private async validatePassword(username: string, password: string): Promise<void> {
+        const hashedPassword: string = this.users.get(username)!.hashedPassword;
+        const matches: boolean = await this.encryptionService.compare(password, hashedPassword);
+
+        if(matches) {
+            return;
+        }
+
+        throw "Bad password.";
     }
 
-    private generateTokenSelector(): Promise <string> {
-        return this.encryptionService.generateRandomToken(16);
+    private async generateTokenSelector(): Promise <string> {
+        return await this.encryptionService.generateRandomToken(16);
     }
 
-    private generateTokenValidator(selector: string): Promise<string> {
-        return new Promise<string>((resolve, reject) => {
-            this.encryptionService.generateRandomToken().then(validator => {
-                resolve(validator);
-            }).catch(reason => {
-                reject(reason);
-            });
-        });
+    private async generateTokenValidator(selector: string): Promise<string> {
+        return await this.encryptionService.generateRandomToken();
+        
     }
 
-    private hashTokenValidator(validator: string): Promise<string> {
-        return new Promise<string>((resolve, reject) => {
-            this.encryptionService.encrypt(validator).then(hash => {
-                resolve(hash);
-            });
-        });
+    private async hashTokenValidator(validator: string): Promise<string> {
+        return await this.encryptionService.encrypt(validator);
     }
 
-    private createSession(selector: string, hashedValidator: string, username: string, longToken: boolean): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            let expiryEpoch: number = Date.now();
-            if(longToken) {
-                expiryEpoch += new Date(0, 0, 0, 1, 0, 0, 0).valueOf();
-            } else {
-                expiryEpoch += new Date(10, 0, 0, 0, 0, 0, 0).valueOf();
-            }
+    private async createSession(selector: string, hashedValidator: string, username: string, longToken: boolean): Promise<void> {
+        let expiryEpoch: number = Date.now();
+        if(!longToken) {
+            expiryEpoch += 3600000;  // One hour in milliseoncds because new Date() sucks
+        } else {
+            expiryEpoch += 315569520000; // Ten years in milliseconds
+        }
 
-            const expiry = new Date(expiryEpoch);
+        const expiry = new Date(expiryEpoch);
 
-            this.sessions.set(selector, {
-                selector,
-                hashedValidator,
-                username,
-                expiry
-            });
-
-            resolve();
+        this.sessions.set(selector, {
+            selector,
+            hashedValidator,
+            username,
+            expiry
         });
     }
 }
