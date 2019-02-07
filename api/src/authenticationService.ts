@@ -14,7 +14,8 @@ interface SessionData {
     selector: string;
     hashedValidator: string;
     username: string;
-    expiry: Date;
+    remember: boolean;
+    lastSeen: number;
 }
 
 export default class AuthenticationService {
@@ -51,29 +52,30 @@ export default class AuthenticationService {
         return { selector, validator };
     }
 
-    public async authenticate(selector: string, validator: string, timestamp: Date): Promise<string> {
+    public async authenticate(selector: string, validator: string, timestamp: number): Promise<string> {
         if(this.sessions.has(selector)) {
             return await this.validateToken(selector, validator, timestamp);
         }
 
-        throw new Error("Session invalid.");
+        throw new Error('Session invalid.');
     }
 
-    private async validateToken(selector: string, validator: string, timestamp: Date): Promise<string> {
-        const hashedValidator: string = this.sessions.get(selector)!.hashedValidator;
-        const expiryDate: Date = this.sessions.get(selector)!.expiry;
+    private async validateToken(selector: string, validator: string, timestamp: number): Promise<string> {
+        const session: SessionData = this.sessions.get(selector)!;
 
-        if(timestamp.valueOf() < expiryDate.valueOf()) {
-            const matches: boolean = await this.encryptionService.compare(validator, hashedValidator);
+        if(session.remember || timestamp - session.lastSeen < 3600000) { // 3,600,000 ms = 1 hour
+            const matches: boolean = await this.encryptionService.compare(validator, session.hashedValidator);
 
             if(matches) {
-                return this.sessions.get(selector)!.username;
+                session.lastSeen = timestamp;
+                return session.username;
             }
 
-            throw new Error("Bad token.");
+            throw new Error('Bad token.');
         }
 
-        throw new Error("Session expired.");
+        this.sessions.delete(selector);
+        throw new Error('Session expired.');
     }
 
     private async checkUserExists(username: string): Promise<void> {
@@ -81,7 +83,7 @@ export default class AuthenticationService {
             return;
         }
 
-        throw new Error("User invalid.");
+        throw new Error('User invalid.');
     }
 
     private async validatePassword(username: string, password: string): Promise<void> {
@@ -92,7 +94,7 @@ export default class AuthenticationService {
             return;
         }
 
-        throw new Error("Bad password.");
+        throw new Error('Bad password.');
     }
 
     private async generateTokenSelector(): Promise <string> {
@@ -107,22 +109,16 @@ export default class AuthenticationService {
         return await this.encryptionService.encrypt(validator);
     }
 
-    private async createSession(selector: string, hashedValidator: string, username: string, longToken: boolean)
+    private async createSession(selector: string, hashedValidator: string, username: string, remember: boolean)
             : Promise<void> {
-        let expiryEpoch: number = Date.now();
-        if(!longToken) {
-            expiryEpoch += 3600000;  // One hour in milliseoncds because new Date() sucks
-        } else {
-            expiryEpoch += 315569520000; // Ten years in milliseconds
-        }
-
-        const expiry = new Date(expiryEpoch);
+        const lastSeen: number = Date.now();
 
         this.sessions.set(selector, {
             selector,
             hashedValidator,
             username,
-            expiry
+            remember,
+            lastSeen
         });
     }
 }
