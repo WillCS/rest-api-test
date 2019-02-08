@@ -1,5 +1,6 @@
 import cookieParser from 'cookie-parser';
 import express from 'express';
+
 import AuthenticationService from './authenticationService';
 
 const app = express();
@@ -25,6 +26,8 @@ app.post('/signup/', (request, response) => {
         } else {
             response.send('Username already taken.\n');
         }
+    }).catch(error => {
+        response.sendStatus(404);
     });
 });
 
@@ -53,13 +56,13 @@ app.post('/login/', (request, response) => {
 });
 
 app.post('/auth/', (request, response) => {
-    const timestamp: number = Date.now();
     const [ selector, validator ] = request.cookies.session.split(':');
-
     if(!selector || !validator) {
         response.sendStatus(400);
         return;
     }
+
+    const timestamp: number = Date.now();
 
     authenticationService.authenticate(selector, validator, timestamp).then(user => {
         response.sendStatus(200);

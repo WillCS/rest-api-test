@@ -15,17 +15,14 @@
         "aws-sdk": "^2.398.0",
         "bcrypt": "^3.0.3",
         "cookie-parser": "^1.4.3",
-        "express": "^4.16.4",
-        "serverless": "^1.37.0"
+        "express": "^4.16.4"
     },
     "devDependencies": {
+        "@types/aws-lambda": "^8.10.19",
         "@types/aws-sdk": "^2.7.0",
         "@types/bcrypt": "^3.0.0",
         "@types/cookie-parser": "^1.4.1",
         "@types/express": "^4.16.1",
-        "@types/serverless": "^1.18.0",
-        "serverless-dynamodb-local": "^0.2.36",
-        "serverless-offline": "^4.2.1",
         "tslint": "^5.12.1",
         "typescript": "^3.3.1"
     }
