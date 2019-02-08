@@ -2,6 +2,7 @@ import cookieParser from 'cookie-parser';
 import express from 'express';
 
 import AuthenticationService from './authenticationService';
+import config from './config';
 
 const app = express();
 const port: number = 3080;
@@ -39,7 +40,7 @@ app.post('/login/', (request, response) => {
     authenticationService.logIn(username, password, remember).then(token => {
         const cookie: express.CookieOptions = {
             httpOnly: true,
-            // secure: true,
+            secure: config.useHTTPS,
             sameSite: 'strict',
             encode: String
         };
