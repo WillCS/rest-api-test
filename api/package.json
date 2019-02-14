@@ -5,7 +5,7 @@
     "main": "./build/app.js",
     "scripts": {
         "build": "tsc",
-        "run": "NODE_ENV=development node ./build/app.js",
+        "run": "node ./build/app.js",
         "start": "npm run-script build && npm run-script run",
         "test": "echo \"Error: no test specified\" && exit 1"
     },

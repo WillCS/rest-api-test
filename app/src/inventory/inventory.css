@@ -1,0 +1,8 @@
+div.inventoryContainer {
+    max-width: 900px;
+    margin: 0px auto;
+    height: 100%;
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}

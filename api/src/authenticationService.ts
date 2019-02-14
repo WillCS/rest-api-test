@@ -3,7 +3,24 @@ import EncryptionService from './encryptionService';
 interface User {
     username: string;
     hashedPassword: string;
+    inventory: Inventory;
 }
+
+interface Inventory {
+    slots: number;
+    items: string[];
+}
+
+const inventory: Inventory = {
+    slots: 5,
+    items: [
+        'a',
+        'b',
+        'c',
+        'd',
+        'e'
+    ]
+};
 
 interface AuthToken {
     selector: string;
@@ -33,7 +50,8 @@ export default class AuthenticationService {
         const hashedPassword: string = await this.encryptionService.encrypt(password);
         this.users.set(username, {
             hashedPassword,
-            username
+            username,
+            inventory
         });
 
         return true;
@@ -58,6 +76,10 @@ export default class AuthenticationService {
         }
 
         throw new Error('Session invalid.');
+    }
+
+    public async getInventory(user: string): Promise<Inventory> {
+        return this.users.get(user)!.inventory;
     }
 
     private async validateToken(selector: string, validator: string, timestamp: number): Promise<string> {

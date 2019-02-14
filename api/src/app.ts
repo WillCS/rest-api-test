@@ -1,5 +1,5 @@
 import cookieParser from 'cookie-parser';
-import express from 'express';
+import express, { Request, Response } from 'express';
 
 import AuthenticationService from './authenticationService';
 import config from './config';
@@ -7,6 +7,12 @@ import config from './config';
 const app = express();
 const port: number = 3080;
 
+app.use((request, response, next) => {
+    response.header('Access-Control-Allow-Origin', 'http://localhost:3000');
+    response.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Set-Cookie');
+    response.header('Access-Control-Allow-Credentials', 'true');
+    next();
+});
 app.use(express.json());
 app.use(cookieParser());
 
@@ -66,7 +72,30 @@ app.post('/auth/', (request, response) => {
     const timestamp: number = Date.now();
 
     authenticationService.authenticate(selector, validator, timestamp).then(user => {
-        response.sendStatus(200);
+        response.json({ username: user });
+    }).catch(error => {
+        response.sendStatus(401);
+    });
+});
+
+app.get('/inventory/', (request, response) => {
+    if(!request.cookies.session) {
+        response.sendStatus(401);
+        return;
+    }
+
+    const [ selector, validator ] = request.cookies.session.split(':');
+    if(!selector || !validator) {
+        response.sendStatus(400);
+        return;
+    }
+
+    const timestamp: number = Date.now();
+
+    authenticationService.authenticate(selector, validator, timestamp)
+    .then(authenticationService.getInventory.bind(authenticationService))
+    .then(inventory => {
+        response.json(inventory);
     }).catch(error => {
         response.sendStatus(401);
     });
