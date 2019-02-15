@@ -12,7 +12,7 @@ class Item extends React.Component<ItemProps, {}> {
     public render(): React.ReactNode {
         return (
             <div className="item">
-                { inventoryStore.inventory!.items[this.props.slotNumber] }
+                { inventoryStore.inventory!.items[this.props.slotNumber].item }
             </div>
         );
     }

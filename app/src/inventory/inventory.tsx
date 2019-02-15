@@ -22,13 +22,13 @@ class Inventory extends React.Component {
                 <p><b>Unauthorized</b></p>
             );
         } else {
-            let slotNumber: number = 0;
+            let slotNumber: number = 0
             return (
                 <div className="inventoryContainer">
                     { 
-                        InventoryStore.inventory.items.map(item => {
+                        Array.from(InventoryStore.inventory.items).map(item => {
                             return (
-                                <InventorySlot slotNumber={ slotNumber++ } />
+                                <InventorySlot itemIndex={ slotNumber++ } />
                             );
                         }) 
                     }

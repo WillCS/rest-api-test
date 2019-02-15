@@ -19,12 +19,24 @@ class InventoryStore {
     
     // Facilitate drag and drop
     @observable currentDraggingSlot?: InventorySlot = undefined;
+    @observable lastDraggingSlot?: InventorySlot = undefined;
+
+    @observable mouseOverSlot?: InventorySlot = undefined;
+    @observable lastMouseOverSlot?: InventorySlot = undefined;
+
+    @observable mouseOverSlotX?: number = undefined;
+    @observable mouseOverSlotY?: number = undefined;
 
     @observable originalX?: number = undefined;
     @observable originalY?: number = undefined;
+    
+    @observable originalMouseOffsetX?: number = undefined;
+    @observable originalMouseOffsetY?: number = undefined;
 
     @observable translateX?: number = undefined;
     @observable translateY?: number = undefined;
+
+    @observable moveComplete: boolean = false;
 
     reset(): void {
         this.inventory = undefined;
@@ -32,10 +44,13 @@ class InventoryStore {
         this.status = ResponseStatus.Unset;
 
         this.currentDraggingSlot = undefined;
+        this.lastDraggingSlot = undefined;
+        this.mouseOverSlot = undefined;
         this.originalX = undefined;
         this.originalY = undefined;
         this.translateX = undefined;
         this.translateY= undefined;
+        this.moveComplete = false;
     }
 
     async fetchInventory(): Promise<void> {
@@ -43,8 +58,6 @@ class InventoryStore {
             this.isLoading = true;
             const fetchData: Response = await ApiService.get("/inventory")
             const body: object = await fetchData.json();
-
-            console.log(body);
             
             this.status = fetchData.status;
             
