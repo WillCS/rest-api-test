@@ -1,22 +1,21 @@
+interface Slot {
+    slotNumber: number;
+    item?: Item;
+}
+
 interface Item {
-    slot: number;
-    item: string;
+    name: string;
 }
 
 class InventoryModel {
-    public slots: number;
-    public items: Item[];
+    public numSlots: number;
+    public slots: Slot[];
 
     public static fromJson(json: any): InventoryModel {
         const inventory = new InventoryModel();
+        console.log(inventory);
+        inventory.numSlots = json.numSlots;
         inventory.slots = json.slots;
-        const items: string[] = json.items;
-
-        inventory.items = [];
-
-        for(let i = 0; i < inventory.slots; i++) {
-            inventory.items.push({ slot: i, item: items[i] });
-        }
 
         return inventory;
     }

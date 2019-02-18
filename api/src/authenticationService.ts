@@ -7,39 +7,48 @@ interface User {
 }
 
 interface Inventory {
-    slots: number;
-    items: string[];
+    numSlots: number;
+    slots: Slot[];
+}
+
+interface Slot {
+    slotNumber: number;
+    item?: Item;
+}
+
+interface Item {
+    name: string;
 }
 
 const inventory: Inventory = {
-    slots: 26,
-    items: [
-        'a',
-        'b',
-        'c',
-        'd',
-        'e',
-        'f',
-        'g',
-        'h',
-        'i',
-        'j',
-        'k',
-        'l',
-        'm',
-        'n',
-        'o',
-        'p',
-        'q',
-        'r',
-        's',
-        't',
-        'u',
-        'v',
-        'w',
-        'x',
-        'y',
-        'z'
+    numSlots: 26,
+    slots: [
+        { slotNumber: 0, item: { name: 'a' } },
+        { slotNumber: 1, item: { name: 'b' } },
+        { slotNumber: 2, item: { name: 'c' } },
+        { slotNumber: 3, item: { name: 'd' } },
+        { slotNumber: 4, item: { name: 'e' } },
+        { slotNumber: 5, item: { name: 'f' } },
+        { slotNumber: 6, item: { name: 'g' } },
+        { slotNumber: 7, item: { name: 'h' } },
+        { slotNumber: 8, item: { name: 'i' } },
+        { slotNumber: 9, item: { name: 'j' } },
+        { slotNumber: 10, item: { name: 'k' } },
+        { slotNumber: 11, item: { name: 'l' } },
+        { slotNumber: 12, item: { name: 'm' } },
+        { slotNumber: 13, item: { name: 'n' } },
+        { slotNumber: 14, item: { name: 'o' } },
+        { slotNumber: 15, item: { name: 'p' } },
+        { slotNumber: 16, item: { name: 'q' } },
+        { slotNumber: 17, item: { name: 'r' } },
+        { slotNumber: 18, item: { name: 's' } },
+        { slotNumber: 19, item: { name: 't' } },
+        { slotNumber: 20, item: { name: 'u' } },
+        { slotNumber: 21, item: { name: 'v' } },
+        { slotNumber: 22, item: { name: 'w' } },
+        { slotNumber: 23, item: { name: 'x' } },
+        { slotNumber: 24, item: { name: 'y' } },
+        { slotNumber: 25, item: { name: 'z' } }
     ]
 };
 
