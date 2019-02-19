@@ -1,40 +1,64 @@
-import { observable } from "mobx";
+import { observable, computed } from "mobx";
 import InventorySlot from './inventorySlot';
 
 class DragManager {
+    @observable isEnabled: boolean = false;
+
     @observable currentDraggingSlot?: InventorySlot = undefined;
     @observable lastDraggingSlot?: InventorySlot = undefined;
 
     @observable mouseOverSlot?: InventorySlot = undefined;
     @observable lastMouseOverSlot?: InventorySlot = undefined;
 
-    @observable mouseOverSlotX?: number = undefined;
-    @observable mouseOverSlotY?: number = undefined;
+    @observable mouseOverSlotOriginalX?: number = undefined;
+    @observable mouseOverSlotOriginalY?: number = undefined;
 
-    @observable originalX?: number = undefined;
-    @observable originalY?: number = undefined;
+    @observable currentDraggingSlotOriginalX?: number = undefined;
+    @observable currentDraggingSlotOriginalY?: number = undefined;
     
-    @observable originalMouseOffsetX?: number = undefined;
-    @observable originalMouseOffsetY?: number = undefined;
+    @observable mouseOffsetOriginalX?: number = undefined;
+    @observable mouseOffsetOriginalY?: number = undefined;
 
     @observable translateX?: number = undefined;
     @observable translateY?: number = undefined;
 
     @observable moveComplete: boolean = false;
 
+    @computed get isDragging(): boolean {
+        return this.currentDraggingSlot != undefined;
+    }
+
+    @computed get isHovering(): boolean {
+        return this.mouseOverSlot != undefined;
+    }
+
+    public enableDragging(): void {
+        this.isEnabled = true;
+    }
+
+    public disableDragging(): void {
+        this.isEnabled = false;
+    }
+
     reset(): void {
         this.currentDraggingSlot = undefined;
-        this.lastDraggingSlot = undefined;
-        this.mouseOverSlot = undefined;
-        this.lastMouseOverSlot = undefined;
-        this.mouseOverSlotX = undefined;
-        this.mouseOverSlotY = undefined;
-        this.originalX = undefined;
-        this.originalY = undefined;
-        this.originalMouseOffsetX = undefined;
-        this.originalMouseOffsetY = undefined;
+        this.currentDraggingSlotOriginalX = undefined;
+        this.currentDraggingSlotOriginalY = undefined;
+
         this.translateX = undefined;
         this.translateY= undefined;
+
+        this.mouseOverSlot = undefined;
+        this.mouseOverSlotOriginalX = undefined;
+        this.mouseOverSlotOriginalY = undefined;
+
+        this.lastMouseOverSlot = undefined;
+        this.lastDraggingSlot = undefined;
+
+        this.mouseOffsetOriginalX = undefined;
+        this.mouseOffsetOriginalY = undefined;
+
+        this.isEnabled = true;
         this.moveComplete = false;
     }
 }

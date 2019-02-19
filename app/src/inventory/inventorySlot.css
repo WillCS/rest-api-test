@@ -8,37 +8,35 @@ div.item {
     color: rgb(103, 103, 103);
     border: 1px rgb(204, 204, 204) solid;
     border-radius: 2px;
-    cursor: grab;
-    z-index: 0;
 }
 
 div.inventorySlot {
-    width: 150px;
-    height: 150px;
-    background-color: rgba(245, 245, 245, 255);
+    width: 100px;
+    height: 100px;
+    background-color: rgba(0, 0, 0, 0);
     padding: 15px;
-    margin: 15px;
-    border: 1px rgb(204, 204, 204) solid;
-    border-radius: 2px;
-    z-index: 0;
+    margin: 16px;
+    z-index: 1;
 }
 
 div.item.dragging {
     transition: transform 0s;
     box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.2), 0 9px 30px 0 rgba(0, 0, 0, 0.19);
     pointer-events: none;
-    cursor: grabbing;
-    z-index: 3;
+    touch-action: none;
 }
 
 div.inventorySlot.dragging {
-    cursor: grabbing;
-    z-index: 3;
+    z-index: 4;
+    touch-action: none;
 }
 
 div.item.hovered {
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-    z-index: 2;
+}
+
+div.inventorySlot.hovered {
+    z-index: 3;
 }
 
 div.item.justMoved {
@@ -47,9 +45,8 @@ div.item.justMoved {
 
 div.item.lastHovered {
     pointer-events: none;
-    z-index: 2;
 }
 
-div.inventorySlot.hovered {
-    
+div.inventorySlot.lastHovered {
+    z-index: 2;
 }
