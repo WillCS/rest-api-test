@@ -18,37 +18,38 @@ interface Slot {
 
 interface Item {
     name: string;
+    rarity: number;
 }
 
 const inventory: Inventory = {
     numSlots: 26,
     slots: [
-        { slotNumber: 0, item: { name: 'a' } },
-        { slotNumber: 1, item: { name: 'b' } },
-        { slotNumber: 2, item: { name: 'c' } },
-        { slotNumber: 3, item: { name: 'd' } },
-        { slotNumber: 4, item: { name: 'e' } },
-        { slotNumber: 5, item: { name: 'f' } },
-        { slotNumber: 6, item: { name: 'g' } },
-        { slotNumber: 7, item: { name: 'h' } },
-        { slotNumber: 8, item: { name: 'i' } },
-        { slotNumber: 9, item: { name: 'j' } },
-        { slotNumber: 10, item: { name: 'k' } },
-        { slotNumber: 11, item: { name: 'l' } },
-        { slotNumber: 12, item: { name: 'm' } },
-        { slotNumber: 13, item: { name: 'n' } },
-        { slotNumber: 14, item: { name: 'o' } },
-        { slotNumber: 15, item: { name: 'p' } },
-        { slotNumber: 16, item: { name: 'q' } },
-        { slotNumber: 17, item: { name: 'r' } },
-        { slotNumber: 18, item: { name: 's' } },
-        { slotNumber: 19, item: { name: 't' } },
-        { slotNumber: 20, item: { name: 'u' } },
-        { slotNumber: 21, item: { name: 'v' } },
-        { slotNumber: 22, item: { name: 'w' } },
-        { slotNumber: 23, item: { name: 'x' } },
-        { slotNumber: 24, item: { name: 'y' } },
-        { slotNumber: 25, item: { name: 'z' } }
+        { slotNumber: 0, item: { name: 'a', rarity: 0 } },
+        { slotNumber: 1, item: { name: 'b', rarity: 1 } },
+        { slotNumber: 2, item: { name: 'c', rarity: 2 } },
+        { slotNumber: 3, item: { name: 'd', rarity: 3 } },
+        { slotNumber: 4, item: { name: 'e', rarity: 4 } },
+        { slotNumber: 5, item: { name: 'f', rarity: 0 } },
+        { slotNumber: 6, item: { name: 'g', rarity: 0 } },
+        { slotNumber: 7, item: { name: 'h', rarity: 0 } },
+        { slotNumber: 8, item: { name: 'i', rarity: 0 } },
+        { slotNumber: 9, item: { name: 'j', rarity: 0 } },
+        { slotNumber: 10, item: { name: 'k', rarity: 0 } },
+        { slotNumber: 11, item: { name: 'l', rarity: 0 } },
+        { slotNumber: 12, item: { name: 'm', rarity: 0 } },
+        { slotNumber: 13, item: { name: 'n', rarity: 0 } },
+        { slotNumber: 14, item: { name: 'o', rarity: 0 } },
+        { slotNumber: 15, item: { name: 'p', rarity: 0 } },
+        { slotNumber: 16, item: { name: 'q', rarity: 0 } },
+        { slotNumber: 17, item: { name: 'r', rarity: 0 } },
+        { slotNumber: 18, item: { name: 's', rarity: 0 } },
+        { slotNumber: 19, item: { name: 't', rarity: 0 } },
+        { slotNumber: 20, item: { name: 'u', rarity: 0 } },
+        { slotNumber: 21, item: { name: 'v', rarity: 0 } },
+        { slotNumber: 22, item: { name: 'w', rarity: 0 } },
+        { slotNumber: 23, item: { name: 'x', rarity: 0 } },
+        { slotNumber: 24, item: { name: 'y', rarity: 0 } },
+        { slotNumber: 25, item: { name: 'z', rarity: 0 } }
     ]
 };
 

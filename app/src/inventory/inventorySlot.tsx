@@ -169,7 +169,7 @@ class InventorySlot extends React.Component<InventorySlotProps, {}> {
         DragManager.mouseOffsetOriginalY = undefined;
     }
 
-    private beginHoveringItem(x: number, y: number, target: Element) {
+    private beginHoveringItem(x: number, y: number, target: Element): void {
         if(DragManager.currentDraggingSlot != this && DragManager.lastMouseOverSlot != this) {
             const rect: ClientRect | DOMRect = target.getBoundingClientRect();
             const absoluteX = rect.left;
@@ -186,7 +186,7 @@ class InventorySlot extends React.Component<InventorySlotProps, {}> {
         }
     }
     
-    private finishHoveringItem(x: number, y: number, target: Element) {
+    private finishHoveringItem(x: number, y: number, target: Element): void {
         if(DragManager.currentDraggingSlot == undefined && DragManager.mouseOverSlot == this) {
             DragManager.mouseOverSlot = undefined;
             DragManager.lastMouseOverSlot = this;
@@ -199,7 +199,7 @@ class InventorySlot extends React.Component<InventorySlotProps, {}> {
         }
     }
     
-    private beginHoveringItemSlot(x: number, y: number, target: Element) {
+    private beginHoveringItemSlot(x: number, y: number, target: Element): void {
         if(DragManager.currentDraggingSlot != undefined && DragManager.mouseOverSlot == this) {
             DragManager.mouseOverSlot = undefined;
             DragManager.lastMouseOverSlot = this;
@@ -245,6 +245,21 @@ class InventorySlot extends React.Component<InventorySlotProps, {}> {
         const outerClasses: [string] = [
             'inventorySlot'
         ];
+
+        switch(InventoryStore.inventory!.slots[this.props.slotIndex].item!.rarity) {
+            case 1: 
+                innerClasses.push('uncommon');
+                break;
+            case 2: 
+                innerClasses.push('rare');
+                break;
+            case 3: 
+                innerClasses.push('legendary');
+                break;
+            case 4: 
+                innerClasses.push('cheat');
+                break;
+        }
 
         if(DragManager.moveComplete) {
             innerClasses.push('justMoved');

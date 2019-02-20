@@ -5,6 +5,7 @@ interface Slot {
 
 interface Item {
     name: string;
+    rarity: number;
 }
 
 class InventoryModel {
