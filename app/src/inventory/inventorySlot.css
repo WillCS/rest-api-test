@@ -22,6 +22,10 @@ div.item.empty.hoverWhileDragging {
     cursor: grabbing;
 }
 
+div.item.empty.hovered {
+    cursor: default;
+}
+
 div.item.uncommon {
     border-color: rgb(50, 205, 50);
 }

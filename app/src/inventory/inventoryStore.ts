@@ -1,6 +1,7 @@
-import { observable } from "mobx";
+import { observable } from 'mobx';
+
 import ApiService from 'src/services/apiService';
-import { InventoryModel } from './inventoryModel';
+import { InventoryModel, Item, Slot } from './inventoryModel';
 
 const enum ResponseStatus {
     Unset,
@@ -12,25 +13,30 @@ const enum ResponseStatus {
 }
 
 class InventoryStore {
-    @observable inventory?: InventoryModel;
-    @observable isLoading: boolean = false;
-    @observable status: ResponseStatus = ResponseStatus.Unset;
+    @observable
+    public inventory?: InventoryModel;
 
-    reset(): void {
+    @observable
+    public isLoading: boolean = false;
+
+    @observable
+    public status: ResponseStatus = ResponseStatus.Unset;
+
+    public reset(): void {
         this.inventory = undefined;
         this.isLoading = false;
         this.status = ResponseStatus.Unset;
     }
 
-    async fetchInventory(): Promise<void> {
+    public async fetchInventory(): Promise<void> {
         try {
             this.isLoading = true;
-            const fetchData: Response = await ApiService.get("/inventory")
+            const fetchData: Response = await ApiService.get('/inventory');
             const body: object = await fetchData.json();
-            
+
             this.status = fetchData.status;
-            
-            if(this.status == ResponseStatus.OK) {
+
+            if(this.status === ResponseStatus.OK) {
                 this.inventory = InventoryModel.fromJson(body);
             }
         } catch(error) {
@@ -38,6 +44,18 @@ class InventoryStore {
         }
 
         this.isLoading = false;
+    }
+
+    public getItemInSlot(slot: number): Item | undefined {
+        return this.inventory!.slots.find(i => i.slotNumber === slot)!.item;
+    }
+
+    public getSlotWithIndex(index: number): Slot {
+        return this.inventory!.slots[index];
+    }
+
+    public slotHasItem(slot: number): boolean {
+        return this.getItemInSlot(slot) !== undefined;
     }
 }
 

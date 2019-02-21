@@ -1,7 +1,8 @@
-import * as React from 'react';
-import './item.css';
-import inventoryStore from './inventoryStore';
 import { observer } from 'mobx-react';
+import * as React from 'react';
+
+import InventoryStore from './InventoryStore';
+import './item.css';
 
 interface ItemProps {
     slotNumber: number;
@@ -11,8 +12,8 @@ interface ItemProps {
 class Item extends React.Component<ItemProps, {}> {
     public render(): React.ReactNode {
         return (
-            <div className="item">
-                { inventoryStore.inventory!.slots[this.props.slotNumber].item!.name }
+            <div className='item'>
+                { InventoryStore.inventory!.slots[this.props.slotNumber].item!.name }
             </div>
         );
     }

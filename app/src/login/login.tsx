@@ -1,6 +1,6 @@
 import * as React from 'react';
 import apiService from 'src/services/apiService';
-import InventoryStore from 'src/inventory/inventoryStore';
+import InventoryStore from 'src/inventory/InventoryStore';
 
 interface LoginState {
     username: string;

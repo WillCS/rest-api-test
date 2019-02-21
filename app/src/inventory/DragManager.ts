@@ -1,35 +1,50 @@
-import { observable, computed } from "mobx";
+import { computed, observable } from 'mobx';
+
 import InventorySlot from './inventorySlot';
 
 class DragManager {
-    @observable isEnabled: boolean = false;
+    @observable
+    public isEnabled: boolean = false;
 
-    @observable currentDraggingSlot?: InventorySlot = undefined;
-    @observable lastDraggingSlot?: InventorySlot = undefined;
+    @observable
+    public currentDraggingSlot?: InventorySlot = undefined;
+    @observable
+    public lastDraggingSlot?: InventorySlot = undefined;
 
-    @observable mouseOverSlot?: InventorySlot = undefined;
-    @observable lastMouseOverSlot?: InventorySlot = undefined;
+    @observable
+    public mouseOverSlot?: InventorySlot = undefined;
+    @observable
+    public lastMouseOverSlot?: InventorySlot = undefined;
 
-    @observable mouseOverSlotOriginalX?: number = undefined;
-    @observable mouseOverSlotOriginalY?: number = undefined;
+    @observable
+    public mouseOverSlotOriginalX?: number = undefined;
+    @observable
+    public mouseOverSlotOriginalY?: number = undefined;
 
-    @observable currentDraggingSlotOriginalX?: number = undefined;
-    @observable currentDraggingSlotOriginalY?: number = undefined;
-    
-    @observable mouseOffsetOriginalX?: number = undefined;
-    @observable mouseOffsetOriginalY?: number = undefined;
+    @observable
+    public currentDraggingSlotOriginalX?: number = undefined;
+    @observable
+    public currentDraggingSlotOriginalY?: number = undefined;
 
-    @observable translateX?: number = undefined;
-    @observable translateY?: number = undefined;
+    @observable
+    public mouseOffsetOriginalX?: number = undefined;
+    @observable
+    public mouseOffsetOriginalY?: number = undefined;
 
-    @observable moveComplete: boolean = false;
+    @observable
+    public translateX?: number = undefined;
+    @observable
+    public translateY?: number = undefined;
+
+    @observable
+    public moveComplete: boolean = false;
 
     @computed get isDragging(): boolean {
-        return this.currentDraggingSlot != undefined;
+        return this.currentDraggingSlot !== undefined;
     }
 
     @computed get isHovering(): boolean {
-        return this.mouseOverSlot != undefined;
+        return this.mouseOverSlot !== undefined;
     }
 
     public enableDragging(): void {
@@ -40,7 +55,7 @@ class DragManager {
         this.isEnabled = false;
     }
 
-    reset(): void {
+    public reset(): void {
         this.currentDraggingSlot = undefined;
         this.currentDraggingSlotOriginalX = undefined;
         this.currentDraggingSlotOriginalY = undefined;
