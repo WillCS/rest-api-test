@@ -10,6 +10,18 @@ div.item {
     border-radius: 2px;
 }
 
+div.item.empty {
+    width: 100%;
+    height: 100%;
+    background: none;
+    border: none;
+    cursor: default;
+}
+
+div.item.empty.hoverWhileDragging {
+    cursor: grabbing;
+}
+
 div.item.uncommon {
     border-color: rgb(50, 205, 50);
 }

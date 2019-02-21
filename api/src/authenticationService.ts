@@ -34,7 +34,7 @@ const inventory: Inventory = {
         { slotNumber: 7, item: { name: 'h', rarity: 0 } },
         { slotNumber: 8, item: { name: 'i', rarity: 0 } },
         { slotNumber: 9, item: { name: 'j', rarity: 0 } },
-        { slotNumber: 10, item: { name: 'k', rarity: 0 } },
+        { slotNumber: 10, item: undefined },
         { slotNumber: 11, item: { name: 'l', rarity: 0 } },
         { slotNumber: 12, item: { name: 'm', rarity: 0 } },
         { slotNumber: 13, item: { name: 'n', rarity: 0 } },

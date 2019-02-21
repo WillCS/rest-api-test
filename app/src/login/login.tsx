@@ -1,5 +1,6 @@
 import * as React from 'react';
 import apiService from 'src/services/apiService';
+import InventoryStore from 'src/inventory/inventoryStore';
 
 interface LoginState {
     username: string;
@@ -36,7 +37,9 @@ class Login extends React.Component<any, LoginState> {
         event.preventDefault();
 
         apiService.post(this.state.login ? '/login' : '/signup', this.state).then(result => {
-            console.log(result);
+            if(this.state.login) {
+                InventoryStore.fetchInventory();
+            }
         }).catch(error => {
             console.error(error);
         });

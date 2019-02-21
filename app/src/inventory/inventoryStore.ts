@@ -1,6 +1,6 @@
 import { observable } from "mobx";
 import ApiService from 'src/services/apiService';
-import InventoryModel from './inventoryModel';
+import { InventoryModel } from './inventoryModel';
 
 const enum ResponseStatus {
     Unset,

@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import InventoryStore from './inventoryStore';
 import DragManager from './DragManager';
 import { setTimeout } from 'timers';
+import { Item } from './inventoryModel';
 
 interface InventorySlotProps {
     slotIndex: number;
@@ -109,21 +110,23 @@ class InventorySlot extends React.Component<InventorySlotProps, {}> {
     }
 
     private beginDraggingItem(x: number, y: number, target: Element): void {
-        const rect: ClientRect | DOMRect = target.getBoundingClientRect();
-        const absoluteX = rect.left;
-        const absoluteY = rect.top;
+        if(DragManager.lastDraggingSlot != this) {
+            const rect: ClientRect | DOMRect = target.getBoundingClientRect();
+            const absoluteX = rect.left;
+            const absoluteY = rect.top;
 
-        DragManager.currentDraggingSlot = this;
-        
-        DragManager.mouseOffsetOriginalX = x - absoluteX;
-        DragManager.mouseOffsetOriginalY = y - absoluteY;
+            DragManager.currentDraggingSlot = this;
+            
+            DragManager.mouseOffsetOriginalX = x - absoluteX;
+            DragManager.mouseOffsetOriginalY = y - absoluteY;
 
-        DragManager.currentDraggingSlotOriginalX = absoluteX + DragManager.mouseOffsetOriginalX;
-        DragManager.currentDraggingSlotOriginalY = absoluteY + DragManager.mouseOffsetOriginalY;
+            DragManager.currentDraggingSlotOriginalX = absoluteX + DragManager.mouseOffsetOriginalX;
+            DragManager.currentDraggingSlotOriginalY = absoluteY + DragManager.mouseOffsetOriginalY;
 
-        window.addEventListener('mousemove', this.handleMouseButtonMoved);
-        window.addEventListener('mouseup', this.handleMouseButtonUp);
-        window.addEventListener('touchend', this.handleTouchEnd);
+            window.addEventListener('mousemove', this.handleMouseButtonMoved);
+            window.addEventListener('mouseup', this.handleMouseButtonUp);
+            window.addEventListener('touchend', this.handleTouchEnd);
+        }
     }
 
     private doDragItem(x: number, y: number): void {
@@ -147,6 +150,13 @@ class InventorySlot extends React.Component<InventorySlotProps, {}> {
             
             InventoryStore.inventory!.slots[this.props.slotIndex].slotNumber = otherSlot;
             InventoryStore.inventory!.slots[mouseOverSlot.props.slotIndex].slotNumber = mySlot;
+
+            console.log(`${x}, ${y}. ${DragManager.mouseOverSlotOriginalX}, ${DragManager.mouseOverSlotOriginalY}.`);
+
+            DragManager.translateX = x - DragManager.mouseOverSlotOriginalX! 
+                - DragManager.mouseOffsetOriginalX!;
+            DragManager.translateY = y - DragManager.mouseOverSlotOriginalY!
+                - DragManager.mouseOffsetOriginalY!
             DragManager.moveComplete = true;
 
             setTimeout(() => {
@@ -212,6 +222,60 @@ class InventorySlot extends React.Component<InventorySlotProps, {}> {
         }
     }
 
+    public renderItem(classes: string[], style: React.CSSProperties): React.ReactNode {
+        const item: Item | undefined = InventoryStore.inventory!.slots[this.props.slotIndex].item;
+
+        if(item != undefined) {
+            switch(InventoryStore.inventory!.slots[this.props.slotIndex].item!.rarity) {
+                case 1: 
+                    classes.push('uncommon');
+                    break;
+                case 2: 
+                    classes.push('rare');
+                    break;
+                case 3: 
+                    classes.push('legendary');
+                    break;
+                case 4: 
+                    classes.push('cheat');
+                    break;
+            }
+
+            return (
+                <div 
+                    className={ classes.join(' ') }
+                    onMouseDown={ this.handleMouseButtonDown }
+                    onMouseEnter={ this.handleMouseEnterItem }
+                    onMouseLeave={ this.handleMouseLeaveItem }
+                    onTouchStart={ this.handleTouchStart }
+                    onTouchMove={ this.handleTouchMoved }
+                    style={ style as React.CSSProperties }
+                >
+                    { InventoryStore.inventory!.slots[this.props.slotIndex].item!.name }
+                </div>
+            );
+        } else {
+
+            classes = ['item', 'empty'];
+
+            if(DragManager.isDragging) {
+                classes.push('hoverWhileDragging');
+            }
+
+            return (
+                <div
+                    className= { classes.join(' ') }
+                    onMouseEnter={ this.handleMouseEnterItem }
+                    onMouseLeave={ this.handleMouseLeaveItem }
+                    onTouchStart={ this.handleTouchStart }
+                    onTouchMove={ this.handleTouchMoved }
+                >
+
+                </div>
+            )
+        }
+    }
+
     public render(): React.ReactNode {
         const dragging: boolean = DragManager.currentDraggingSlot != undefined;
         const draggingMe: boolean = DragManager.currentDraggingSlot == this;
@@ -219,7 +283,7 @@ class InventorySlot extends React.Component<InventorySlotProps, {}> {
         let translateX: number = draggingMe ? DragManager.translateX! : 0;
         let translateY: number = draggingMe ? DragManager.translateY! : 0;
 
-        if(draggingMe) {
+        if(draggingMe || (DragManager.lastDraggingSlot == this && DragManager.moveComplete)) {
             translateX = DragManager.translateX!;
             translateY = DragManager.translateY!;
         }
@@ -233,83 +297,52 @@ class InventorySlot extends React.Component<InventorySlotProps, {}> {
                 - DragManager.mouseOverSlotOriginalY!;
         }
 
-        if(!dragging && DragManager.lastDraggingSlot == this && DragManager.lastMouseOverSlot != undefined) {
-            translateX = 0;
-            translateY = 0;
-        }
-
-        const innerClasses: [string] = [
+        const itemClasses: [string] = [
             'item'
         ];
 
-        const outerClasses: [string] = [
+        const slotClasses: [string] = [
             'inventorySlot'
         ];
 
-        switch(InventoryStore.inventory!.slots[this.props.slotIndex].item!.rarity) {
-            case 1: 
-                innerClasses.push('uncommon');
-                break;
-            case 2: 
-                innerClasses.push('rare');
-                break;
-            case 3: 
-                innerClasses.push('legendary');
-                break;
-            case 4: 
-                innerClasses.push('cheat');
-                break;
-        }
-
         if(DragManager.moveComplete) {
-            innerClasses.push('justMoved');
+            itemClasses.push('justMoved');
         }
 
         if(draggingMe) {
-            innerClasses.push('dragging');
-            outerClasses.push('dragging');
+            itemClasses.push('dragging');
+            slotClasses.push('dragging');
         }
 
         if(DragManager.mouseOverSlot == this) {
-            innerClasses.push('hovered');
-            outerClasses.push('hovered');
+            itemClasses.push('hovered');
+            slotClasses.push('hovered');
         }
 
         if(DragManager.lastMouseOverSlot == this) {
-            innerClasses.push('lastHovered');
-            outerClasses.push('lastHovered');
+            itemClasses.push('lastHovered');
+            slotClasses.push('lastHovered');
         }
 
         if(DragManager.lastDraggingSlot == this) {
-            outerClasses.push('lastDragged');
+            slotClasses.push('lastDragged');
         }
 
-        const innerStyle = {
+        const itemStyle = {
             transform: `translate(${translateX}px, ${translateY}px)`,
         };
-        
 
-        const outerStyle = {
+        const slotStyle = {
             order: InventoryStore.inventory!.slots[this.props.slotIndex].slotNumber
         }
 
         return (
             <div 
-                className={ outerClasses.join(' ') }
-                style={ outerStyle as React.CSSProperties }
+                className={ slotClasses.join(' ') }
+                style={ slotStyle as React.CSSProperties }
                 onMouseLeave={ this.handleMouseLeaveItemSlot }
             >
-                <div 
-                    className={ innerClasses.join(' ') }
-                    onMouseDown={ this.handleMouseButtonDown }
-                    onMouseEnter={ this.handleMouseEnterItem }
-                    onMouseLeave={ this.handleMouseLeaveItem }
-                    onTouchStart={ this.handleTouchStart }
-                    onTouchMove={ this.handleTouchMoved }
-                    style={ innerStyle as React.CSSProperties }
-                >
-                    { InventoryStore.inventory!.slots[this.props.slotIndex].item!.name }
-                </div>
+                { this.renderItem(itemClasses, itemStyle) }
             </div>
         );
     }

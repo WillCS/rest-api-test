@@ -1,14 +1,14 @@
-interface Slot {
+export interface Slot {
     slotNumber: number;
     item?: Item;
 }
 
-interface Item {
+export interface Item {
     name: string;
     rarity: number;
 }
 
-class InventoryModel {
+export class InventoryModel {
     public numSlots: number;
     public slots: Slot[];
 
@@ -21,5 +21,3 @@ class InventoryModel {
         return inventory;
     }
 }
-
-export default InventoryModel;
