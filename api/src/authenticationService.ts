@@ -66,7 +66,7 @@ interface SessionData {
     lastSeen: number;
 }
 
-export default class AuthenticationService {
+class AuthenticationService {
     // These are our """"""""databases""""""""
     private users: Map<string, User> = new Map<string, User>();
     private sessions: Map<string, SessionData> = new Map<string, SessionData>();
@@ -175,3 +175,5 @@ export default class AuthenticationService {
         });
     }
 }
+
+export default new AuthenticationService();

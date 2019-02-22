@@ -36,7 +36,7 @@ class Inventory extends React.Component {
 
         if(DragManager.isDragging) {
             containerClasses.push('dragging');
-        } else if(DragManager.isHovering) {
+        } else if(DragManager.isHovering && DragManager.mouseOverSlot!.item !== undefined) {
             containerClasses.push('hovering');
         }
 

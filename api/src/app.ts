@@ -1,10 +1,18 @@
 import cookieParser from 'cookie-parser';
-import express, { Request, Response } from 'express';
+import express, { Application, Request, Response, Router } from 'express';
 
 import AuthenticationService from './authenticationService';
 import config from './config';
 
-const app = express();
+import UserRoute, { userPath } from './features/user/UserRoute';
+
+const basePath: string = '/api';
+
+const app: Application = express();
+const router: Router = express.Router();
+
+router.use(userPath, UserRoute);
+
 const port: number = 3080;
 
 app.use((request, response, next) => {
@@ -16,9 +24,7 @@ app.use((request, response, next) => {
 app.use(express.json());
 app.use(cookieParser());
 
-const authenticationService: AuthenticationService = new AuthenticationService();
-
-app.post('/signup/', (request, response) => {
+router.post('/signup/', (request, response) => {
     const username: string = request.body.username;
     const password: string = request.body.password;
 
@@ -38,7 +44,7 @@ app.post('/signup/', (request, response) => {
     });
 });
 
-app.post('/login/', (request, response) => {
+router.post('/login/', (request, response) => {
     const username: string = request.body.username;
     const password: string = request.body.password;
     const remember: boolean = request.body.remember;
@@ -62,7 +68,7 @@ app.post('/login/', (request, response) => {
     });
 });
 
-app.post('/auth/', (request, response) => {
+router.post('/auth/', (request, response) => {
     const [ selector, validator ] = request.cookies.session.split(':');
     if(!selector || !validator) {
         response.sendStatus(400);
@@ -78,7 +84,7 @@ app.post('/auth/', (request, response) => {
     });
 });
 
-app.get('/inventory/', (request, response) => {
+router.get('/inventory/', (request, response) => {
     if(!request.cookies.session) {
         response.sendStatus(401);
         return;
@@ -100,5 +106,7 @@ app.get('/inventory/', (request, response) => {
         response.sendStatus(401);
     });
 });
+
+app.use(basePath, router);
 
 app.listen(port);

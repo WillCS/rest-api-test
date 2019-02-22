@@ -1,6 +1,7 @@
 import * as React from 'react';
-import apiService from 'src/services/apiService';
+
 import InventoryStore from 'src/inventory/InventoryStore';
+import apiService from 'src/services/apiService';
 
 interface LoginState {
     username: string;
@@ -14,7 +15,7 @@ const updateState = (key: keyof LoginState, value: any) => (
 ): LoginState => ({
     ...prevState,
     [key]: value,
-})
+});
 
 class Login extends React.Component<any, LoginState> {
     constructor(props: any) {
@@ -24,13 +25,25 @@ class Login extends React.Component<any, LoginState> {
             password: '',
             login: true,
             signup: false
-        }
+        };
 
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleSetLogin = this.handleSetLogin.bind(this);
         this.handleSetSignup = this.handleSetSignup.bind(this);
         this.onChangeUsername = this.onChangeUsername.bind(this);
         this.onChangePassword = this.onChangePassword.bind(this);
+    }
+
+    public render(): React.ReactNode {
+        return (
+            <form onSubmit={this.handleSubmit}>
+                <input type='text' name='username' value={this.state.username} onChange={this.onChangeUsername}/>
+                <input type='password' name='password' value={this.state.password} onChange={this.onChangePassword}/>
+                <input type='radio' name='type' value='login' onChange={this.handleSetLogin} defaultChecked/>Login
+                <input type='radio' name='type' value='signup' onChange={this.handleSetSignup}/>Signup
+                <input type='submit' value='submit'/>
+            </form>
+        );
     }
 
     private handleSubmit(event: React.FormEvent): void {
@@ -63,18 +76,6 @@ class Login extends React.Component<any, LoginState> {
     private onChangePassword(event: React.ChangeEvent<HTMLInputElement>) {
         event.preventDefault();
         this.setState(updateState('password', event.target.value));
-    }
-
-    public render(): React.ReactNode {
-        return (
-            <form onSubmit={this.handleSubmit}>
-                <input type="text" name="username" value={this.state.username} onChange={this.onChangeUsername}/>
-                <input type="password" name="password" value={this.state.password} onChange={this.onChangePassword}/>
-                <input type="radio" name="type" value="login" onChange={this.handleSetLogin} defaultChecked/>Login
-                <input type="radio" name="type" value="signup" onChange={this.handleSetSignup}/>Signup
-                <input type="submit" value="submit"/>
-            </form>
-        );
     }
 }
 
