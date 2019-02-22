@@ -33,7 +33,7 @@ router.post('/signup/', (request, response) => {
         return;
     }
 
-    authenticationService.newUser(username, password).then(signedUp => {
+    AuthenticationService.newUser(username, password).then(signedUp => {
         if(signedUp) {
             response.send('Signed up successfully.\n');
         } else {
@@ -49,7 +49,7 @@ router.post('/login/', (request, response) => {
     const password: string = request.body.password;
     const remember: boolean = request.body.remember;
 
-    authenticationService.logIn(username, password, remember).then(token => {
+    AuthenticationService.logIn(username, password, remember).then(token => {
         const cookie: express.CookieOptions = {
             httpOnly: true,
             secure: config.useHTTPS,
@@ -77,7 +77,7 @@ router.post('/auth/', (request, response) => {
 
     const timestamp: number = Date.now();
 
-    authenticationService.authenticate(selector, validator, timestamp).then(user => {
+    AuthenticationService.authenticate(selector, validator, timestamp).then(user => {
         response.json({ username: user });
     }).catch(error => {
         response.sendStatus(401);
@@ -98,8 +98,8 @@ router.get('/inventory/', (request, response) => {
 
     const timestamp: number = Date.now();
 
-    authenticationService.authenticate(selector, validator, timestamp)
-    .then(authenticationService.getInventory.bind(authenticationService))
+    AuthenticationService.authenticate(selector, validator, timestamp)
+    .then(AuthenticationService.getInventory.bind(AuthenticationService))
     .then(inventory => {
         response.json(inventory);
     }).catch(error => {
